@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT use API</title>
+</head>
+<body style="text-align: center;">
+    <h1>ChatGPT API</h1>
+    <form action="">
+        <input type="text" name="message" id="message">
+        <button type="submit">Send</button>
+    </form>
+    <div id="chat-log">
+
+    </div>
+
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const message = document.getElementById('message');
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const messageText = message.value;
+            message.value ='';
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add('message--sent');
+            messageElement.innerHTML =`
+                <div class="message__text" style="color:green; font-size: 24px;"> ${messageText}</div>`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            fetch('http://localhost:3000',{
+                method:'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message:messageText
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add('message--received');
+                messageElement.innerHTML=`
+                <div class="message__text" style="color:red; font-size: 24px;">${data.completion.content}</div>
+                `;
+                chatLog.appendChild(messageElement);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            })
+
+        })
+    </script>
+    
+</body>
+</html>
